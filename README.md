@@ -1,13 +1,16 @@
 # Enumerables-Ruby-methods
 
-In this repository I show the main methods found in the module Enumerables created from scratch
+In this repository I rebuild the main methods found in the module Enumerable.
 
 <img src="https://gohighbrow.com/wp-content/uploads/2018/01/7_An-introduction-to-the-Java-programming.jpg" width="100%" >
+
+
 ---
 
 > Enumerables project as part of microverse curriculum 
 
 --- 
+
 ## Built With
 
 - Ruby
@@ -63,3 +66,10 @@ Give a ⭐️ if you like this project!
 ## 📝 License
 
 This project is [MIT](lic.url) licensed.
+
+## 📝 Bibliography
+
+
+
+
+
