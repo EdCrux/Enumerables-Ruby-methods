@@ -1,34 +1,50 @@
 module Enumerable
-  public
-
   def my_each
-    return self.to_enum unless block_given?
+    return to_enum unless block_given?
 
-    self.length.times { |i| yield self[i] } if self.is_a? Array
-    if self.is_a? Hash
-      i = 0
-      while i <= self.length - 1 do
-        yield [self.keys[i], self.values[i]]
+    i = 0
+    if is_a? Array
+      while i <= length - 1
+        yield [self[i]]
+        i += 1
+      end
+    else
+      arr = to_a
+      while i <= length - 1
+        yield [arr[i][0], arr[i][1]]
         i += 1
       end
     end
   end
 
-  def my_each_index
-    return self.to_enum unless block_given?
+  def my_each_with_index
+    return to_enum unless block_given?
 
     i = 0
-    if self.is_a? Array
-      while i <= self.length - 1 do
+    if is_a? Array
+      while i <= length - 1
         yield [self[i], i]
         i += 1
       end
-    end
-    if self.is_a? Hash
-      while i <= self.length - 1 do
-        yield [self.keys[i], self.values[i], i]
+    else
+      arr = to_a
+      while i <= length - 1
+        yield [arr[i], i]
         i += 1
       end
     end
+  end
+
+  def my_select
+    return to_enum unless block_given?
+
+    if is_a? Array
+      arr = []
+      my_each { |i| arr << i if yield(i) }
+    else
+      hashy = {}
+      my_each { |i| hashy[i.to_a[0]] = i.to_a[1] if yield i.to_a[0], i.to_a[1] }
+    end
+    hashy
   end
 end
