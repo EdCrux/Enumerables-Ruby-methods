@@ -5,10 +5,10 @@ module Enumerable
     i = 0
     if is_a? Array
       while i <= length - 1
-        yield [self[i]]
+        yield (self[i])
         i += 1
       end
-    else
+    elsif is_a? Hash
       arr = to_a
       while i <= length - 1
         yield [arr[i][0], arr[i][1]]
@@ -26,7 +26,7 @@ module Enumerable
         yield [self[i], i]
         i += 1
       end
-    else
+    elsif is_a? Hash
       arr = to_a
       while i <= length - 1
         yield [arr[i], i]
@@ -41,10 +41,11 @@ module Enumerable
     if is_a? Array
       arr = []
       my_each { |i| arr << i if yield(i) }
-    else
+    elsif is_a? Hash
       hashy = {}
       my_each { |i| hashy[i.to_a[0]] = i.to_a[1] if yield i.to_a[0], i.to_a[1] }
     end
     hashy
   end
+  
 end
