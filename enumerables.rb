@@ -31,4 +31,11 @@ module Enumerable
       end
     end
   end
+
+  def my_select
+    return self.to_enum unless block_given?
+    i=0
+    
+    
+  end
 end
