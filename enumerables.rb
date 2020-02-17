@@ -1,3 +1,5 @@
+require 'byebug'
+
 module Enumerable
   def my_each
     return to_enum unless block_given?
@@ -81,5 +83,19 @@ module Enumerable
       my_each { |i| return true if i == data }
     end
     false
+  end
+
+  def my_none?(data = nil)
+    return my_none?(data) if block_given? && !data.nil?
+
+    if block_given?
+      my_all? { |i| return false if yield(i) }
+      true
+    elsif data.is_a? Regexp
+      my_all? { |i| return false if i.to_s.match(data) }
+    elsif data.is_a? Class
+      my_all? { |i| return false if i.is_a? data }
+    end
+    true
   end
 end
