@@ -1,11 +1,14 @@
 require_relative "enumerables"
+require 'byebug'
 
-series = {
-    friends: 2,
-    malcom: 5,
-    sabrina: 1
-  }
+public
 
-x = [2,3,5,8,7]
 
-x.my_each_index{ |a,i| puts "Index:#{i}" }
+
+p %w[ant bear cat].my_any? { |word| word.length >= 3 } #=> true
+p %w[ant bear cat].any? { |word| word.length >= 4 } #=> true
+p %w[ant bear cat].any?(/d/)                        #=> false
+p [nil, true, 99].any?(Integer)                     #=> true
+p [nil, true, 99].any?                              #=> true
+p [].any?                                           #=> false
+
