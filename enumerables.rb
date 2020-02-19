@@ -62,7 +62,7 @@ module Enumerable
     elsif data.is_a? Regexp
       my_each { |i| return false unless i.to_s.match(data) }
     elsif data.is_a? Class
-      my_each { |item| return false unless item.is_a? data }
+      my_each { |i| return false unless i.is_a? data }
     else
       my_each { |i| return false unless i == data }
     end
@@ -97,5 +97,46 @@ module Enumerable
       my_all? { |i| return false if i.is_a? data }
     end
     true
+  end
+
+  def my_count(data = nil)
+    return my_count(data) if block_given? && !data.nil?
+
+    counter = 0
+    if block_given?
+      my_each { |i| return counter += 1 if yield(i) }
+    elsif !data.nil?
+      my_each { |i| return counter += 1 if i == data }
+    end
+  end
+
+  def my_map
+    return to_enum(:my_map) if !block_given? && proc.nil?
+
+    map_array = []
+    my_each { |item| map_array << yield(item) }
+    map_array
+  end
+
+  def my_inject(*initial)
+    arr = to_a
+    memo = arr[0]
+    if initial[1].nil? && block_given?
+      memo = initial[0]
+    elsif initial[1].nil? && !block_given?
+      sym = initial[0]
+      memo = 0
+    else
+      memo = initial[0]
+      sym = initial[1]
+    end
+    arr.my_each do |item|
+      if sym
+        memo = memo.send sym, item
+      else
+        memo = yield(memo, item)
+      end
+    end
+    memo
   end
 end
