@@ -2,14 +2,13 @@
 
 In this repository I rebuild the main methods found in the module Enumerable.
 
-<img src="https://gohighbrow.com/wp-content/uploads/2018/01/7_An-introduction-to-the-Java-programming.jpg" width="100%" >
-
+<img src="https://gohighbrow.com/wp-content/uploads/2018/01/7_An-introduction-to-the-Java-programming.jpg" width="100%">
 
 ---
 
-> Enumerables project as part of microverse curriculum 
+> Enumerables project as part of microverse curriculum
 
---- 
+---
 
 ## Built With
 
@@ -19,10 +18,11 @@ In this repository I rebuild the main methods found in the module Enumerable.
 
 [Live Demo Link](https://repl.it/@EdCrux/Bubble-Sort-Marian-Edu)
 
-
 ## Getting Started
 
-**You can download the zip file, o take a look on the live demo**
+Install ruby 2.6.5
+Clone the repo
+Bundle init
 
 ### Prerequisites
 
@@ -35,12 +35,13 @@ In this repository I rebuild the main methods found in the module Enumerable.
 
 ### Install
 
-`gem rubocop` `bundle install`
+`bundle install`
 
 ### Run tests
 
 Rubocop lint
-` rubocop .`
+
+`rubocop enumerables.rb`
 
 ### Deployment
 
@@ -67,10 +68,3 @@ Give a ⭐️ if you like this project!
 ## 📝 License
 
 This project is [MIT](lic.url) licensed.
-
-## 📝 Bibliography
-
-
-
-
-

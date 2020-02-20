@@ -52,23 +52,19 @@ module Enumerable
   end
 
   def my_all?(data = nil)
-    return my_all?(data) if block_given? && !data.nil?
+    return my_none?(data) if block_given? && !data.nil?
+
+    arr = to_a
+    return true if arr.empty?
+
     if block_given?
-      my_each { |i| return false unless yield(i) }
-      true
-    elsif data.nil?
-      arr = to_a
-      index = 0
-      while index <= arr.length-1
-        return false unless arr[index].class == arr[index + 1].class
-        index += 1  
-      end
-    elsif data.is_a? Regexp
-      my_each { |i| return false unless i.to_s.match(data) }
+      to_a.my_each { |item| return false unless yield(item) }
+    elsif data.nil? && !block_given?
+      to_a.my_each { |item| return false unless item }
     elsif data.is_a? Class
-      my_each { |i| return false unless i.is_a? data }
-    else
-      my_each { |i| return false unless i == data }
+      to_a.my_each { |item| return false unless item.is_a? data }
+    elsif data.is_a? Regexp
+      to_a.my_each { |item| return false unless item.to_s.match(data) }
     end
     true
   end
@@ -77,28 +73,31 @@ module Enumerable
     return my_any?(data) if block_given? && !data.nil?
 
     if block_given?
-      my_each { |item| return true if yield item }
+      to_a.my_each { |item| return true if yield item }
       false
     elsif data.is_a? Regexp
-      my_each { |i| return true if i.to_s.match(data) }
+      to_a.my_each { |item| return true if item.to_s.match(data) }
     elsif data.is_a? Class
-      my_each { |i| return true if i.is_a? data }
+      to_a.my_each { |item| return true if item.is_a? data }
     else
-      my_each { |i| return true if i == data }
+      to_a.my_each { |item| return true if item == data }
     end
     false
   end
 
   def my_none?(data = nil)
     return my_none?(data) if block_given? && !data.nil?
-  
+
     if block_given?
-      my_all? { |i| return false if yield(i) }
+      to_a.my_each { |item| return false if yield(item) }
     elsif data.is_a? Regexp
-      my_all? { |i| return false if i.to_s.match(data) }
+      to_a.my_each { |item| return false if item.to_s.match(data) }
     elsif data.is_a? Class
-      my_all? { |i| return false if i.class == data }
+      to_a.my_each { |item| return false if item.is_a? data }
+    elsif data.nil?
+      to_a.my_each { |item| return false if item }
     end
+    true
   end
 
   def my_count(*data)
@@ -117,7 +116,7 @@ module Enumerable
   end
 
   def my_map
-    return to_enum(:my_map) if !block_given? 
+    return to_enum(:my_map) unless block_given?
 
     map_array = []
     to_a.my_each { |item| map_array << yield(item) }
