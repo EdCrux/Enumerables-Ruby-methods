@@ -1,47 +1,82 @@
-require_relative "enumerables"
+#require_relative "enumerables"
 require 'byebug'
-
 
 public
 
-def my_inject(*initial)
-    arr = to_a
-    if initial[0].nil?
-        memo = arr[0]
-    elsif initial[1].nil? && !block_given?
-        sym  = initial[0]
-        memo = 0
-    elsif initial[1].nil? && block_given?
-        memo = initial[0]
-    else
-        memo = initial[0]
-        sym  = initial[1]
-    end 
-    arr.each do |item| 
-        if sym
-           memo = memo.send(sym, item)
-        else 
-           memo = yield(memo,item)
-        end
+def my_each
+  return to_enum(:my_each) unless block_given?
+
+  i = 0
+  if is_a? Array
+    while i <= length - 1
+      yield (self[i])
+      i += 1
     end
-    memo
+  elsif is_a? Hash
+    arr = to_a
+    while i <= length - 1
+      yield [arr[i][0], arr[i][1]]
+      i += 1
+    end
+  end
+  self
 end
 
-#Sum some numbers
-p (5..10).my_inject(:+)
-#                             #=> 45 ✔
-# # Multiply some numbers
- p (5..10).my_inject(1, :*)                          #=> 151200 ✔ 
+proc { |x| x }
+my_each
 
-# # Same using a block and inject
- p (5..100).my_inject { |sum, n| sum + n }            #=> 45 ✔
 
-# # Same using a block
- p (5..10).my_inject(1) { |product, n| product * n } #=> 151200 ✔ 
 
-# # find the longest word
- longest = %w{ cat sheep bear }.my_inject do |memo, word|
-   memo.length > word.length ? memo : word
- end
-# #longest                                        #=> "sheep"
- p longest
+
+
+
+
+
+
+
+
+def my_all?(data = nil)
+  return my_all?(data) if block_given? && !data.nil?
+  if block_given?
+    my_each { |i| return false unless yield(i) }
+    true
+  elsif data.nil?
+    arr = to_a
+    index = 0
+    while index <= arr.length-1
+      return false unless arr[index].class == arr[index + 1].class
+      index += 1  
+    end
+  elsif data.is_a? Regexp
+    my_each { |i| return false unless i.to_s.match(data) }
+  elsif data.is_a? Class
+    my_each { |i| return false unless i.is_a? data }
+  else
+    my_each { |i| return false unless i == data }
+  end
+  true
+end
+
+def my_none?(data = nil)
+  return my_none?(data) if block_given? && !data.nil?
+
+  if block_given?
+    my_all? { |item| yield(item) ? false : true }
+  elsif data.is_a? Regexp
+    my_all? { |i| return false if i.to_s.match(data) }
+  elsif data.is_a? Class
+    my_all? { |i| return false if i.is_a? data }
+  elsif data.nil?
+    my_all?(data)
+  end
+end
+
+p %w{ant bear cat}.my_all? { |word| word.length === 5 } #=> false
+p %w{ant bear cat}.my_none? { |word| word.length == 5 } #=> true
+p %w{ant bear cat}.my_none? { |word| word.length >= 4 } #=> false
+p %w{ant bear cat}.my_none?(/d/)                        #=> true
+p [1, 3.14, 42].my_none?(Float)                         #=> false
+p [].my_none?                                           #=> true
+p [nil].my_none?                                        #=> true
+p [nil, false].my_none?                                 #=> true
+p [nil, false, true].my_none?                           #=> false

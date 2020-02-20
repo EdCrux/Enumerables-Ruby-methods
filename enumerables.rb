@@ -2,7 +2,7 @@ require 'byebug'
 
 module Enumerable
   def my_each
-    return to_enum unless block_given?
+    return to_enum(:my_each) unless block_given?
 
     i = 0
     if is_a? Array
@@ -21,7 +21,7 @@ module Enumerable
   end
 
   def my_each_with_index
-    return to_enum unless block_given?
+    return to_enum(:my_each_with_index) unless block_given?
 
     i = 0
     if is_a? Array
@@ -39,26 +39,30 @@ module Enumerable
   end
 
   def my_select
-    return to_enum unless block_given?
+    return to_enum(:my_select) unless block_given?
 
-    if is_a? Array
-      arr = []
-      my_each { |i| arr << i if yield(i) }
-    elsif is_a? Hash
+    if is_a? Hash
       hashy = {}
-      my_each { |i| hashy[i.to_a[0]] = i.to_a[1] if yield i.to_a[0], i.to_a[1] }
+      my_each { |item| hashy[item.to_a[0]] = item.to_a[1] if yield i.to_a[0], i.to_a[1] }
+    else
+      arr = []
+      to_a.my_each { |item| arr << item if yield(item) }
+      arr
     end
-    hashy
   end
 
   def my_all?(data = nil)
     return my_all?(data) if block_given? && !data.nil?
-
     if block_given?
       my_each { |i| return false unless yield(i) }
       true
     elsif data.nil?
-      my_each { |i| i }
+      arr = to_a
+      index = 0
+      while index <= arr.length-1
+        return false unless arr[index].class == arr[index + 1].class
+        index += 1  
+      end
     elsif data.is_a? Regexp
       my_each { |i| return false unless i.to_s.match(data) }
     elsif data.is_a? Class
@@ -87,56 +91,52 @@ module Enumerable
 
   def my_none?(data = nil)
     return my_none?(data) if block_given? && !data.nil?
-
+  
     if block_given?
       my_all? { |i| return false if yield(i) }
-      true
     elsif data.is_a? Regexp
       my_all? { |i| return false if i.to_s.match(data) }
     elsif data.is_a? Class
-      my_all? { |i| return false if i.is_a? data }
+      my_all? { |i| return false if i.class == data }
     end
-    true
   end
 
-  def my_count(data = nil)
-    return my_count(data) if block_given? && !data.nil?
+  def my_count(*data)
+    arr = to_a
+    return 0 if arr.empty?
 
     counter = 0
-    if block_given?
-      my_each { |i| return counter += 1 if yield(i) }
-    elsif !data.nil?
-      my_each { |i| return counter += 1 if i == data }
+    if data[0]
+      arr.my_each { |item| counter += 1 if item == data[0] }
+    elsif block_given?
+      arr.my_each { |item| counter += 1 if yield(item) }
+    else
+      arr.my_each { |item| counter += 1 if item }
     end
+    counter
   end
 
   def my_map
-    return to_enum(:my_map) if !block_given? && proc.nil?
+    return to_enum(:my_map) if !block_given? 
 
     map_array = []
-    my_each { |item| map_array << yield(item) }
+    to_a.my_each { |item| map_array << yield(item) }
     map_array
   end
 
   def my_inject(*initial)
     arr = to_a
-    memo = arr[0]
-    if initial[1].nil? && block_given?
-      memo = initial[0]
-    elsif initial[1].nil? && !block_given?
-      sym = initial[0]
-      memo = 0
-    else
-      memo = initial[0]
-      sym = initial[1]
-    end
-    arr.my_each do |item|
-      if sym
-        memo = memo.send sym, item
-      else
-        memo = yield(memo, item)
-      end
-    end
+    return raise ArgumentError, 'Given arguments 0, expected at least 1' if initial.empty? && !block_given?
+
+    memo = initial.length == 2 && arr.respond_to?(initial[1]) || initial.length == 1 && block_given? ? initial[0] : arr.shift
+    sym = if initial.length == 2
+            initial[1]
+          elsif !block_given? && initial.length == 1 && arr.respond_to?(initial[0])
+            initial[0]
+          else
+            false
+          end
+    arr.my_each { |item| memo = sym ? memo.send(sym, item) : yield(memo, item) }
     memo
   end
 end
