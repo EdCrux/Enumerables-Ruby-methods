@@ -63,6 +63,8 @@ module Enumerable
       to_a.my_each { |item| return false unless item.is_a? data }
     elsif data.is_a? Regexp
       to_a.my_each { |item| return false unless item.to_s.match(data) }
+    elsif data
+      to_a.my_each { |item| return false unless item == data }
     end
     true
   end
@@ -77,7 +79,7 @@ module Enumerable
       to_a.my_each { |item| return true if item.to_s.match(data) }
     elsif data.is_a? Class
       to_a.my_each { |item| return true if item.is_a? data }
-    else
+    elsif data
       to_a.my_each { |item| return true if item == data }
     end
     false
@@ -94,6 +96,8 @@ module Enumerable
       to_a.my_each { |item| return false if item.is_a? data }
     elsif data.nil?
       to_a.my_each { |item| return false if item }
+    elsif data
+      to_a.my_each { |item| return false if item == data }
     end
     true
   end
