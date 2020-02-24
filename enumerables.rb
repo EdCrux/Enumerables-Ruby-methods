@@ -81,6 +81,8 @@ module Enumerable
       to_a.my_each { |item| return true if item.is_a? data }
     elsif data
       to_a.my_each { |item| return true if item == data }
+    elsif data.nil?
+      to_a.my_each { |item| return true if item }
     end
     false
   end
@@ -139,5 +141,9 @@ module Enumerable
           end
     arr.my_each { |item| memo = sym ? memo.send(sym, item) : yield(memo, item) }
     memo
+  end
+
+  def multiply_els(arrays)
+    arrays.my_inject(:*)
   end
 end
