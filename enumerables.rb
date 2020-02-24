@@ -89,7 +89,7 @@ module Enumerable
     return my_none?(data) if block_given? && !data.nil?
 
     if block_given?
-      to_a.my_each { |item| return false if yield(item) }
+      to_a.my_each { |item| return false if yield item }
     elsif data.is_a? Regexp
       to_a.my_each { |item| return false if item.to_s.match(data) }
     elsif data.is_a? Class
@@ -127,7 +127,7 @@ module Enumerable
 
   def my_inject(*initial)
     arr = to_a
-    return raise ArgumentError, 'Given arguments 0, expected at least 1' if initial.empty? && !block_given?
+    return raise ArgumentError, 'Given arguments 0, expected 1' if initial.empty? && !block_given?
 
     memo = initial.length == 2 && arr.respond_to?(initial[1]) || initial.length == 1 && block_given? ? initial[0] : arr.shift
     sym = if initial.length == 2
